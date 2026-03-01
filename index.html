@@ -14,6 +14,7 @@
             --text-primary: #f8fafc;
             --text-secondary: #94a3b8;
             --border-radius: 15px;
+            --color-number: #facc15; /* Yellow for numbers */
         }
 
         body {
@@ -88,8 +89,8 @@
         .word-num-sidebar {
             font-family: monospace;
             font-weight: 800;
-            opacity: 0.3;
-            font-size: 12pt;
+            color: var(--color-number);
+            font-size: 14pt;
         }
 
         .audio-btn {
@@ -226,7 +227,8 @@
                 <div class="definition-card">
                     <div class="flex justify-between items-center mb-10">
                         <div class="flex items-center gap-4">
-                            <span class="text-3xl font-black opacity-10">#${data.id}</span>
+                            <!-- Number in Yellow without hashtag -->
+                            <span class="text-3xl font-black text-yellow-400">${data.id}</span>
                             <!-- Word specifically at 20pt as requested -->
                             <h2 style="font-size: 20pt; color: ${data.color};" class="font-extrabold tracking-tight">${data.word}</h2>
                         </div>
