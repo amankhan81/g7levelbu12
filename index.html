@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Lexicon</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0a0f1e;
+            --bg-card: #161e31;
+            --bg-sidebar: #0f172a;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-radius: 15px;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+            /* Set base font size to 18pt as requested */
+            font-size: 18pt;
+        }
+
+        .sidebar {
+            width: 300px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid #1e293b;
+            height: 100vh;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #334155 transparent;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.05), transparent);
+        }
+
+        .definition-card {
+            background-color: var(--bg-card);
+            border-radius: var(--border-radius);
+            padding: 40px;
+            width: 100%;
+            max-width: 900px;
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .word-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            /* Words in sidebar at 18pt as requested */
+            font-size: 18pt;
+        }
+
+        .word-item:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        .word-item.active {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-left: 5px solid currentColor;
+        }
+
+        .word-num-sidebar {
+            font-family: monospace;
+            font-weight: 800;
+            opacity: 0.3;
+            font-size: 12pt;
+        }
+
+        .audio-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-primary);
+        }
+
+        .audio-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.05);
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 10px;
+            font-size: 18pt; /* Content font size */
+            font-weight: 600;
+            margin: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .synonym-tag { color: #4ade80; border-color: rgba(74, 222, 128, 0.3); }
+        .antonym-tag { color: #f87171; border-color: rgba(248, 113, 113, 0.3); }
+
+        .section-label {
+            font-size: 10pt;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: #64748b;
+            font-weight: 800;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-label::after {
+            content: "";
+            flex-grow: 1;
+            height: 1px;
+            background: linear-gradient(to right, #1e293b, transparent);
+        }
+
+        .sidebar::-webkit-scrollbar { width: 3px; }
+        .sidebar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+    </style>
+</head>
+<body class="flex">
+
+    <aside class="sidebar flex flex-col shadow-2xl">
+        <div class="p-6 border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-10">
+            <h1 class="text-xl font-extrabold tracking-tighter text-indigo-400">LEXICON<span class="text-white">.</span></h1>
+        </div>
+        <div id="wordList" class="flex-grow"></div>
+    </aside>
+
+    <main class="main-content">
+        <div id="displayArea" class="w-full flex justify-center"></div>
+    </main>
+
+    <script>
+        const words = [
+            { id: "01", word: "Abound", meaning: "To exist in great numbers or quantities.", sentence: "Freshwater fish abound in these pristine mountain streams.", synonyms: "flourish, teem, overflow", antonyms: "lack, vanish, deficient", color: "#38bdf8" },
+            { id: "02", word: "Braggart", meaning: "A person who boasts about their achievements or possessions.", sentence: "He was such a braggart that no one believed his true accomplishments.", synonyms: "boaster, show-off, swaggerer", antonyms: "modest person, humble soul", color: "#f87171" },
+            { id: "03", word: "Cache", meaning: "A collection of items of the same type stored in a hidden place.", sentence: "The explorers discovered a hidden cache of supplies left by the previous team.", synonyms: "hoard, store, accumulation", antonyms: "exposure, void", color: "#4ade80" },
+            { id: "04", word: "Clarification", meaning: "The action of making a statement or situation more comprehensible.", sentence: "The manager issued a clarification regarding the new office policies.", synonyms: "explanation, elucidation, simplification", antonyms: "confusion, obscuration", color: "#fbbf24" },
+            { id: "05", word: "Despondent", meaning: "In low spirits from loss of hope or courage.", sentence: "After failing the exam for the third time, she felt utterly despondent.", synonyms: "disheartened, discouraged, depressed", antonyms: "cheerful, optimistic, hopeful", color: "#818cf8" },
+            { id: "06", word: "Embezzle", meaning: "Steal or misappropriate money placed in one's trust.", sentence: "The accountant was arrested for trying to embezzle funds from the non-profit.", synonyms: "misappropriate, pilfer, defraud", antonyms: "compensate, give back", color: "#a78bfa" },
+            { id: "07", word: "Heartrending", meaning: "Causing great sadness or distress.", sentence: "The documentary shared a heartrending story of a family separated by war.", synonyms: "distressing, agonizing, tragic", antonyms: "joyful, heartening", color: "#f472b6" },
+            { id: "08", word: "Leisurely", meaning: "Acting or done without hurry; relaxed.", sentence: "They took a leisurely stroll through the park on Sunday afternoon.", synonyms: "relaxed, unhurried, easygoing", antonyms: "rushed, hurried, hectic", color: "#22d3ee" },
+            { id: "09", word: "Lethargic", meaning: "Affected by lethargy; sluggish and apathetic.", sentence: "Hot weather often makes people feel lethargic and unmotivated.", synonyms: "sluggish, listless, inactive", antonyms: "energetic, vigorous, alert", color: "#fb923c" },
+            { id: "10", word: "Malady", meaning: "A disease or ailment.", sentence: "Scientists are working hard to find a cure for this mysterious malady.", synonyms: "illness, sickness, disorder", antonyms: "health, wellness", color: "#38bdf8" },
+            { id: "11", word: "Mellow", meaning: "Pleasantly smooth or soft; free from harshness.", sentence: "The jazz singer had a mellow voice that calmed the entire room.", synonyms: "smooth, relaxed, gentle", antonyms: "harsh, strident, sharp", color: "#a3e635" },
+            { id: "12", word: "Nomadic", meaning: "Living the life of a nomad; wandering.", sentence: "The tribe maintained a nomadic lifestyle, moving with the seasons.", synonyms: "wandering, roaming, itinerant", antonyms: "settled, stationary, fixed", color: "#e879f9" },
+            { id: "13", word: "Piecemeal", meaning: "Characterized by unsystematic partial measures.", sentence: "The renovation was done piecemeal over several years due to budget constraints.", synonyms: "gradual, bit by bit, fragmentary", antonyms: "complete, comprehensive", color: "#2dd4bf" },
+            { id: "14", word: "Quest", meaning: "A long or arduous search for something.", sentence: "The knight began his quest to find the legendary golden chalice.", synonyms: "expedition, search, pursuit", antonyms: "retreat, stagnation", color: "#94a3b8" },
+            { id: "15", word: "Random", meaning: "Made, done, or chosen without method or conscious decision.", sentence: "The computer generated a random sequence of numbers for the experiment.", synonyms: "arbitrary, chance, accidental", antonyms: "planned, systematic, deliberate", color: "#f43f5e" },
+            { id: "16", word: "Rant", meaning: "Speak or shout at length in a wild, impassioned way.", sentence: "The neighbor began to rant about the noise from the construction site.", synonyms: "tirade, outburst, rave", antonyms: "whisper, quietness", color: "#fb923c" },
+            { id: "17", word: "Reinforce", meaning: "Strengthen or support with additional material.", sentence: "Engineers worked to reinforce the bridge after the heavy flooding.", synonyms: "strengthen, fortify, bolster", antonyms: "weaken, undermine", color: "#6366f1" },
+            { id: "18", word: "Seclusion", meaning: "The state of being private and away from other people.", sentence: "The writer preferred the seclusion of her cabin in the woods.", synonyms: "isolation, privacy, solitude", antonyms: "socializing, publicity", color: "#f1f5f9" },
+            { id: "19", word: "Status", meaning: "The relative social or professional standing of someone.", sentence: "He worked hard to improve his social status within the community.", synonyms: "standing, rank, position", antonyms: "insignificance, lowliness", color: "#c084fc" },
+            { id: "20", word: "Turmoil", meaning: "A state of great disturbance, confusion, or uncertainty.", sentence: "The country was in political turmoil following the sudden election results.", synonyms: "confusion, upheaval, chaos", antonyms: "peace, order, calm", color: "#f87171" }
+        ];
+
+        function playSound(id) {
+            const wordData = words.find(w => w.id === id);
+            const audio = new Audio(`${id}.mp3`);
+            
+            audio.play().catch(() => {
+                if ('speechSynthesis' in window) {
+                    const utterance = new SpeechSynthesisUtterance(wordData.word);
+                    utterance.rate = 0.85;
+                    window.speechSynthesis.speak(utterance);
+                }
+            });
+        }
+
+        function highlightInSentence(sentence, word, color) {
+            const regex = new RegExp(`(${word})`, 'gi');
+            return sentence.replace(regex, `<span style="color: ${color}; font-weight: 800;">$1</span>`);
+        }
+
+        function selectWord(id) {
+            const wordData = words.find(w => w.id === id);
+            
+            document.querySelectorAll('.word-item').forEach(el => {
+                el.classList.remove('active');
+                el.style.color = '';
+            });
+            const activeEl = document.querySelector(`[data-id="${id}"]`);
+            if (activeEl) {
+                activeEl.classList.add('active');
+                activeEl.style.color = wordData.color;
+            }
+
+            renderCard(wordData);
+        }
+
+        function renderCard(data) {
+            const highlightedSentence = highlightInSentence(data.sentence, data.word, data.color);
+            const displayArea = document.getElementById('displayArea');
+            
+            const synHtml = data.synonyms.split(', ').map(s => `<span class="tag synonym-tag">${s}</span>`).join('');
+            const antHtml = data.antonyms.split(', ').map(a => `<span class="tag antonym-tag">${a}</span>`).join('');
+
+            displayArea.innerHTML = `
+                <div class="definition-card">
+                    <div class="flex justify-between items-center mb-10">
+                        <div class="flex items-center gap-4">
+                            <span class="text-3xl font-black opacity-10">#${data.id}</span>
+                            <!-- Word specifically at 20pt as requested -->
+                            <h2 style="font-size: 20pt; color: ${data.color};" class="font-extrabold tracking-tight">${data.word}</h2>
+                        </div>
+                        <button onclick="playSound('${data.id}')" class="audio-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="space-y-10">
+                        <section>
+                            <span class="section-label">Meaning</span>
+                            <p class="font-medium text-slate-200">${data.meaning}</p>
+                        </section>
+
+                        <section>
+                            <span class="section-label">Example</span>
+                            <p class="italic text-slate-400 leading-relaxed">"${highlightedSentence}"</p>
+                        </section>
+
+                        <div class="grid grid-cols-1 gap-8 pt-4">
+                            <section>
+                                <span class="section-label">Synonyms</span>
+                                <div class="flex flex-wrap -ml-1 mt-1">${synHtml}</div>
+                            </section>
+                            <section>
+                                <span class="section-label">Antonyms</span>
+                                <div class="flex flex-wrap -ml-1 mt-1">${antHtml}</div>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function init() {
+            const listContainer = document.getElementById('wordList');
+            words.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'word-item';
+                div.innerHTML = `
+                    <span class="word-num-sidebar">${item.id}</span>
+                    <span class="font-bold tracking-tight">${item.word}</span>
+                `;
+                div.setAttribute('data-id', item.id);
+                div.onclick = () => selectWord(item.id);
+                listContainer.appendChild(div);
+            });
+            selectWord("01");
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
